@@ -1,0 +1,39 @@
+version: "3"
+
+networks:
+  boilerplate-network:
+
+services: 
+  python:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: boilerplate-python
+    env_file:
+      - .env
+    volumes:
+      - ./app:/app
+    ports:
+      - "5000:80"
+    networks:
+      - boilerplate-network
+    entrypoint: ["/start-reload.sh"]
+    depends_on:
+      - postgres
+    
+  postgres:
+    image: postgres:12
+    container_name: 'boilerplate-postgres'
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5001:5432"
+    env_file:
+      - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=homestead
+      - POSTGRES_USER=homestead
+      - POSTGRES_PASSWORD=homestead
+    networks:
+      - boilerplate-network
